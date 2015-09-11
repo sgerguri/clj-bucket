@@ -1,9 +1,8 @@
 (ns clj-bucket.core
   (:require [clojure.core.async :refer [chan <!! >! <! timeout go dropping-buffer]]))
 
-; To keep the throttler precise even for high frequencies, we set up a
-; minimum sleep time. This is an observation originally made in the
-; throttler library (TODO: link) that is reused here as well.
+; As observed in https://github.com/brunoV/throttler, the minimum
+; reliable sleep period is 10 ms.
 (def min-drip-period 10)
 (def unit->ms
   {:millisecond 1
