@@ -1,6 +1,5 @@
 (ns clj-bucket.core_test
   (:require [clojure.test :refer :all]
-            [clojure.algo.generic.math-functions :refer [approx=]]
             [clj-bucket.core :refer :all]))
 
 (defmacro time-expr
@@ -9,12 +8,12 @@
          results# (dotimes [x# ~times] ~expr)
          end# (System/nanoTime)
          duration-ns# (- end# start#)
-         duration-s# (Math/round (/ duration-ns# 1E9))]
+         duration-s# (/ duration-ns# 1E9)]
      [results# duration-s#]))
 
 (deftest throttling
   (let [bucket (bucket 1 1 :second)
         f (constantly 1)
-        approx= (fn [expected actual] (approx= expected actual 1E-4))
-        results (time-expr 3 (throttle bucket f))]
-    (is (< 3 (second results)))))
+        results (time-expr 4 (throttle bucket f))]
+    (testing "it is not possible to execute N calls in N-1 seconds"
+      (is (< 3 (second results))))))
