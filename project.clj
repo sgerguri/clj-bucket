@@ -1,4 +1,4 @@
-(defproject sgerguri/clj-bucket "0.1.1-SNAPSHOT"
+(defproject sgerguri/clj-bucket "0.1.1"
   :description "A low-level implementation of the token bucket algorithm"
   :url "https://github.com/sgerguri/clj-bucket"
   :license {:name "Eclipse Public License"
