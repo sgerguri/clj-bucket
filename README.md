@@ -14,7 +14,7 @@ function need to change. By exposing the throttling channel this library allows 
 Add clj-bucket as a dependency to your `project.clj`:
 
 ```clj
-[sgerguri/clj-bucket 0.1.1]
+[sgerguri/clj-bucket 0.1.2]
 ```
 
 Then in your namespace, import `clj-bucket.core`:
