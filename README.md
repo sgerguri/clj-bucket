@@ -14,7 +14,7 @@ function need to change. By exposing the throttling channel this library allows 
 Add clj-bucket as a dependency to your `project.clj`:
 
 ```clj
-[sgerguri/clj-bucket 0.1.2]
+[sgerguri/clj-bucket 0.1.3]
 ```
 
 Then in your namespace, import `clj-bucket.core`:
@@ -29,8 +29,8 @@ To create a token bucket:
 (bucket 5 1 :second)
 ```
 
-This gives you back a bucket that adds a new token every second,
-with a capacity of 5 tokens in total. Tokens that exceed the capacity
+This gives you back a bucket that allows 1 function call per second,
+with a burstiness (capacity) of 5 tokens in total. Tokens that exceed the capacity
 of the bucket are discarded.
 
 Function calls are throttled explicitly per function call with the bucket:

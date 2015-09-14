@@ -23,8 +23,8 @@
   (when-not (and rate (pos? rate))
     (throw (IllegalArgumentException. "Rate must be a positive number.")))
 
-  (let [desired-rate (/ (unit->ms unit) rate)]
-    (int (round (max desired-rate min-drip-period)))))
+  (let [unit (unit->ms unit)]
+    (max min-drip-period (int (/ unit  rate)))))
 
 (defn- bucket-chan
   [size]
