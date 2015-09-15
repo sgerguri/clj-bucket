@@ -1,5 +1,5 @@
 (ns clj-bucket.core
-  (:require [clojure.core.async :refer [chan <!! >! <! timeout go dropping-buffer]]))
+  (:require [clojure.core.async :refer [chan close! <!! >! <! timeout go dropping-buffer]]))
 
 ; As observed in https://github.com/brunoV/throttler, the minimum
 ; reliable sleep period is 10 ms.
@@ -46,6 +46,12 @@
         drip-period (drip-period rate unit)]
     (start-dripping! bucket drip-period)
     bucket))
+
+(defn close-bucket!
+  "Closes the bucket channel. A convenience method to help avoid importing clojure.core.async
+  in caller namespace."
+  [bucket]
+  (close! bucket))
 
 (defn throttle
   "Throttles the function call with the provided bucket.

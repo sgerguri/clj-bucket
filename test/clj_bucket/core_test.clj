@@ -16,4 +16,7 @@
         f (constantly 1)
         results (time-expr 4 (throttle bucket f))]
     (testing "it is not possible to execute N calls in N-1 seconds"
-      (is (< 3 (second results))))))
+      (is (< 3 (second results))))
+    (testing "throttling with a closed bucket throws exception"
+      (close-bucket! bucket)
+      (is (thrown? IllegalArgumentException (throttle bucket f))))))
