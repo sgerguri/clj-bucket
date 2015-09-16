@@ -51,7 +51,8 @@
   "Closes the bucket channel. A convenience method to help avoid importing clojure.core.async
   in caller namespace."
   [bucket]
-  (close! bucket))
+  (when bucket
+    (close! bucket)))
 
 (defn throttle
   "Throttles the function call with the provided bucket.
