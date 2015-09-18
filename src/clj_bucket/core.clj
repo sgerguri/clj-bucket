@@ -1,5 +1,5 @@
 (ns clj-bucket.core
-  (:require [clojure.core.async :refer [chan close! <!! >! <! timeout go dropping-buffer]]))
+  (:require [clojure.core.async :refer [chan close! <!! <! >! go go-loop dropping-buffer put!]]))
 
 ; As observed in https://github.com/brunoV/throttler, the minimum
 ; reliable sleep period is 10 ms.
@@ -14,7 +14,7 @@
 
 (defn- round [n] (Math/round (double n)))
 
-(defn- drip-period
+(defn- drip-config
   "Calculates the drip period in ms, given the desired rate.
   If this is less than 10 ms, takes 10 ms instead."
   [rate unit]
@@ -23,18 +23,29 @@
   (when-not (and rate (pos? rate))
     (throw (IllegalArgumentException. "Rate must be a positive number.")))
 
-  (let [unit (unit->ms unit)]
-    (max min-drip-period (int (/ unit  rate)))))
+  (let [unit (unit->ms unit)
+        drip-period (max min-drip-period (int (/ unit rate)))
+        rate-ms (/ rate unit)
+        tokens-per-drip (round (* drip-period rate-ms))]
+    [drip-period tokens-per-drip]))
 
 (defn- bucket-chan
   [size]
   (chan (dropping-buffer size)))
 
+(defn- put-tokens
+  [ch n]
+  (go-loop [n n
+            success? true]
+    (if (and (pos? n) success?)
+      (recur (dec n) (>! ch :token))
+      success?)))
+
 (defn- start-dripping!
-  [ch drip-period]
+  [ch drip-period tokens-per-drip]
   (go
-    (while (>! ch :token)
-      (<! (timeout drip-period)))))
+   (while (<! (put-tokens ch tokens-per-drip))
+     (Thread/sleep drip-period))))
 
 (defn bucket
   "Creates a new token bucket with the given token drip rate and capacity."
@@ -43,8 +54,8 @@
     (throw (IllegalArgumentException. "Bucket size must be a positive number.")))
 
   (let [bucket (bucket-chan size)
-        drip-period (drip-period rate unit)]
-    (start-dripping! bucket drip-period)
+        [drip-period tokens-per-drip] (drip-config rate unit)]
+    (start-dripping! bucket drip-period tokens-per-drip)
     bucket))
 
 (defn close-bucket!

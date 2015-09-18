@@ -5,16 +5,14 @@ A low-level implementation of the [token bucket](https://en.wikipedia.org/wiki/T
 Function calls are throttled explicitly with the bucket per function call. Buckets are implemented as core.async
 channels and are returned to the called in verbatim; this allows the caller to close the bucket when needed.
 
-The [throttler](https://github.com/brunoV/throttler) library served as the original inspiration for this library
-(which started as its fork), but it is prone to leak channels in settings where the throttling settings for a given
-function need to change. By exposing the throttling channel this library allows the caller to close it and avoid the leak.
+The [throttler](https://github.com/brunoV/throttler) library served as an inspiration for this library. One disadvantage of the library is that the throttled function keeps three core.async channels open internally which cannot be explicitly closed. This can lead to a channel leak in situations where the throttling needs to frequently change. By exposing the throttling channel this library allows the caller to close it and avoid the leak.
 
 ## Usage
 
 Add clj-bucket as a dependency to your `project.clj`:
 
 ```clj
-[clj-bucket 0.1.5]
+[clj-bucket 0.2.0]
 ```
 
 Then in your namespace, import `clj-bucket.core`:
